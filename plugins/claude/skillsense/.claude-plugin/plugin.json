@@ -1,0 +1,6 @@
+{
+  "name": "skillsense",
+  "version": "0.1.0",
+  "description": "Recalls relevant installed AI capabilities before Claude processes a prompt.",
+  "author": { "name": "SkillSense" }
+}

@@ -1,0 +1,9 @@
+{
+  "session_id": "test-session",
+  "prompt_id": "550e8400-e29b-41d4-a716-446655440001",
+  "transcript_path": "/tmp/transcript.jsonl",
+  "cwd": "tests/fixtures",
+  "permission_mode": "default",
+  "hook_event_name": "UserPromptSubmit",
+  "prompt_text": "What's a good recipe for banana bread?"
+}

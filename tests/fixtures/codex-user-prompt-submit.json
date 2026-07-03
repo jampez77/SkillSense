@@ -1,0 +1,10 @@
+{
+  "session_id": "test-session",
+  "transcript_path": null,
+  "cwd": "tests/fixtures",
+  "hook_event_name": "UserPromptSubmit",
+  "model": "gpt-5-codex",
+  "turn_id": "test-turn",
+  "permission_mode": "default",
+  "prompt": "Can you help fix this Home Assistant config flow? The login appears to have failed, error is probably transient because refreshing the integration fixes it."
+}

@@ -1,0 +1,5 @@
+{
+  "name": "skillsense",
+  "version": "0.1.0",
+  "description": "Automatically recalls relevant installed AI capabilities before Codex processes a prompt."
+}

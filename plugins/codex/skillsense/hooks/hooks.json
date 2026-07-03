@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "skillsense hook codex",
+            "statusMessage": "Checking relevant capabilities"
+          }
+        ]
+      }
+    ]
+  }
+}

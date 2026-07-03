@@ -1,0 +1,22 @@
+{
+  "name": "skillsense",
+  "version": "0.1.0",
+  "description": "SkillSense CLI: local capability-recall engine for AI coding agents.",
+  "type": "module",
+  "bin": {
+    "skillsense": "./bin/skillsense"
+  },
+  "main": "./dist/index.js",
+  "files": ["dist", "bin"],
+  "scripts": {
+    "build": "tsup src/index.ts --format esm --sourcemap --clean --target node22",
+    "dev": "tsup src/index.ts --format esm --watch --target node22"
+  },
+  "dependencies": {
+    "@skillsense/core": "0.1.0",
+    "commander": "^12.1.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.2"
+  }
+}

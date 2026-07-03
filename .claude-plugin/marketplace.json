@@ -1,0 +1,12 @@
+{
+  "name": "skillsense-dev",
+  "owner": { "name": "SkillSense" },
+  "description": "Local dev marketplace for testing the SkillSense Claude Code plugin from a working checkout.",
+  "plugins": [
+    {
+      "name": "skillsense",
+      "source": "./plugins/claude/skillsense",
+      "description": "Recalls relevant installed AI capabilities before Claude processes a prompt."
+    }
+  ]
+}
