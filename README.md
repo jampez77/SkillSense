@@ -32,6 +32,7 @@ reminds them what you've already installed, right before they process each promp
 - [What it does](#what-it-does)
 - [At a glance](#at-a-glance)
 - [Why it exists](#why-it-exists)
+- [The built-in mechanism has limits too](#the-built-in-mechanism-has-limits-too)
 - [How it works](#how-it-works)
 - [Supported agents](#supported-agents)
 - [Installation](#installation)
@@ -116,6 +117,32 @@ toward the right one. SkillSense answers one question, automatically, on every p
 
 > **"Before this prompt is processed, are there any installed capabilities that appear materially
 > relevant?"**
+
+<br>
+
+## The built-in mechanism has limits too
+
+Claude Code's own implicit-activation isn't free or infinite — it's worth knowing the actual
+constraints, since they're exactly why this gets less reliable as you install more:
+
+- **It's budgeted, not unbounded.** Skill descriptions loaded into context are capped at roughly
+  **1% of the model's context window**, measured in characters. Run `/context` in a session to
+  see the actual "Skills" row size. Once you're past that budget, Claude Code starts truncating or
+  dropping the least-used skills rather than sending everything.
+- **You can tune or disable it yourself**, at several levels:
+
+  | Scope | How |
+  | --- | --- |
+  | One skill, fully | `disable-model-invocation: true` in that skill's frontmatter — removes it from context; only invocable via explicit `/skill-name` afterward |
+  | One skill, name-only | `skillOverrides` set to `"name-only"` — keeps the name in context, drops the description, to save budget |
+  | One skill, hard off | `skillOverrides` set to `"off"` |
+  | Claude Code's bundled skills | `disableBundledSkills` setting |
+  | A whole plugin | `claude plugin disable <name>` |
+
+There's no single "turn off all implicit skill scanning" switch — the character budget is the
+built-in throttle instead. The practical takeaway: once you're past that budget and skills start
+getting truncated, the model has *less* to go on for implicit recall, not more — which is exactly
+the situation SkillSense's explicit, scored nudge is meant to help with.
 
 <br>
 
