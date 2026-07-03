@@ -106,8 +106,13 @@ you ask the agent to do a task
             └─ you get a weaker answer, or reinvent the workflow by hand
 ```
 
-The problem isn't skill *execution* — it's skill *recall*. SkillSense answers one question,
-automatically, on every prompt:
+The problem isn't skill *execution* — it's skill *recall*. Both Claude Code and Codex already
+support **implicit activation**: a skill's name, description, and "when to use" text are always
+loaded into context (the full body loads only on invocation), and the model can decide to use it
+on its own, no `/skill-name` required. SkillSense doesn't invent that mechanism — it makes it more
+reliable. The more skills, commands, and rules you accumulate, the more metadata the model has to
+silently scan and pick correctly from on every single turn, with nothing external nudging it
+toward the right one. SkillSense answers one question, automatically, on every prompt:
 
 > **"Before this prompt is processed, are there any installed capabilities that appear materially
 > relevant?"**
