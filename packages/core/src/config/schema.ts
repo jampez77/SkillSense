@@ -6,7 +6,6 @@ export const configSchema = z.object({
   minScore: z.number().min(0).max(1).default(0.75),
   maxRecommendations: z.number().int().min(1).max(5).default(3),
   includePathsInOutput: z.boolean().default(true),
-  includeReasonsInOutput: z.boolean().default(true),
   outputPathMode: z.enum(["full", "relative", "hidden"]).default("relative"),
   autoScan: z
     .object({

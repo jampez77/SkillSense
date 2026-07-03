@@ -3,7 +3,6 @@ import type { CapabilityMatch, OutputPathMode } from "../types.js";
 
 export interface FormatOptions {
   includePathsInOutput: boolean;
-  includeReasonsInOutput: boolean;
   outputPathMode: OutputPathMode;
 }
 
@@ -16,9 +15,19 @@ function displayPath(absPath: string, mode: OutputPathMode): string | undefined 
   return absPath;
 }
 
+function describe(match: CapabilityMatch, options: FormatOptions): string {
+  const cap = match.capability;
+  const path = options.includePathsInOutput ? displayPath(cap.path, options.outputPathMode) : undefined;
+  return path ? `${cap.name} (${path})` : cap.name;
+}
+
 /**
- * Builds the shared recommendation body (spec section 18's preferred format). Both the Claude
- * plain-text hook and the Codex additionalContext JSON wrap this identical text.
+ * Builds the shared, deliberately minimal recommendation body — a single line, no matter what.
+ * Both the Claude plain-text hook and the Codex additionalContext JSON wrap this identical text.
+ *
+ * One match: a bare nudge naming it. More than one: explicitly defers the choice to the user
+ * instead of letting the agent silently pick — ambiguity between installed capabilities is a
+ * decision for a human, not something to paper over with a longer explanation.
  */
 export function formatRecommendationBody(
   matches: CapabilityMatch[],
@@ -26,30 +35,12 @@ export function formatRecommendationBody(
 ): string {
   if (matches.length === 0) return "";
 
-  const lines: string[] = [];
-  lines.push("SkillSense capability recall:");
-  lines.push("");
-  lines.push("The following installed capabilities appear relevant to this prompt:");
-  lines.push("");
+  if (matches.length === 1) {
+    return `SkillSense: relevant installed capability — ${describe(matches[0]!, options)}`;
+  }
 
-  matches.forEach((match, index) => {
-    const cap = match.capability;
-    lines.push(`${index + 1}. ${cap.name}`);
-    lines.push(`   Type: ${cap.type}`);
-    lines.push(`   Source: ${cap.source}`);
-    if (options.includeReasonsInOutput) {
-      const reason = match.reasons.length > 0 ? match.reasons.join("; ") : "matched this prompt";
-      lines.push(`   Reason: ${reason}`);
-    }
-    if (options.includePathsInOutput) {
-      const p = displayPath(cap.path, options.outputPathMode);
-      if (p) lines.push(`   Path: ${p}`);
-    }
-    lines.push("");
-  });
-
-  lines.push("Use these capabilities only if they are appropriate for the task.");
-  return lines.join("\n");
+  const items = matches.map((m) => describe(m, options)).join(", ");
+  return `SkillSense: multiple relevant capabilities installed — ask the user which to use: ${items}`;
 }
 
 export function formatClaudeHookOutput(matches: CapabilityMatch[], options: FormatOptions): string {

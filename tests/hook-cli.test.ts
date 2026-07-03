@@ -35,9 +35,9 @@ describe("CLI hook adapters (spawned end-to-end, matches spec section 26 accepta
     const result = runCli(["hook", "claude"], { HOME: fakeHome }, JSON.stringify(payload));
 
     expect(result.status).toBe(0);
-    expect(result.stdout).toContain("SkillSense capability recall:");
+    expect(result.stdout).toContain("SkillSense:");
     expect(result.stdout).toContain("flutter-performance-review");
-    expect(result.stdout).toContain("Use these capabilities only if they are appropriate for the task.");
+    expect(result.stdout.trim().split("\n")).toHaveLength(1);
   });
 
   it("hook claude emits nothing for a non-matching prompt, and still exits 0", () => {

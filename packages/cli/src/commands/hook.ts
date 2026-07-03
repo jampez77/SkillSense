@@ -75,7 +75,6 @@ async function runHook(platform: Platform): Promise<void> {
 
     const formatOptions = {
       includePathsInOutput: config.includePathsInOutput,
-      includeReasonsInOutput: config.includeReasonsInOutput,
       outputPathMode: config.outputPathMode,
     };
 

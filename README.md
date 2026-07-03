@@ -65,27 +65,30 @@ Before your prompt reaches Claude Code or Codex, SkillSense:
 
 ## At a glance
 
+The injected nudge is deliberately a single line — just enough for the agent to act on, nothing
+more. When exactly one capability matches:
+
 ```text
 You ask:
   "Can you help fix this Home Assistant config flow? The login appears to have
    failed, probably transient, refreshing the integration fixes it."
 
 SkillSense quietly adds:
-  ┌──────────────────────────────────────────────────────────────────────┐
-  │ SkillSense capability recall:                                        │
-  │                                                                      │
-  │ The following installed capabilities appear relevant to this prompt: │
-  │                                                                      │
-  │ 1. home-assistant-integration-debugging                              │
-  │    Type: skill · Source: codex                                       │
-  │    Reason: prompt mentions Home Assistant, config flow, integration  │
-  │    Path: ~/.codex/skills/home-assistant-integration-debugging        │
-  │                                                                      │
-  │ Use these capabilities only if they are appropriate for the task.    │
-  └──────────────────────────────────────────────────────────────────────┘
-
-The agent continues, now aware a purpose-built skill already exists.
+  SkillSense: relevant installed capability — home-assistant-integration-debugging
+  (~/.codex/skills/home-assistant-integration-debugging)
 ```
+
+When more than one capability matches, SkillSense doesn't guess on your behalf — it hands the
+choice to you:
+
+```text
+SkillSense quietly adds:
+  SkillSense: multiple relevant capabilities installed — ask the user which to use:
+  flutter-performance-review (~/.claude/skills/flutter-performance-review),
+  android-profiler-checklist (~/Development/shared-skills/android-profiler)
+```
+
+Either way it's one line, and it's silent when nothing matches well.
 
 <br>
 
@@ -199,7 +202,6 @@ scanPaths: []            # extra directories to scan, in addition to the built-i
 minScore: 0.75
 maxRecommendations: 3    # hard cap is 5 regardless of this value
 includePathsInOutput: true
-includeReasonsInOutput: true
 outputPathMode: relative # full | relative | hidden
 autoScan:
   enabled: true
@@ -268,10 +270,9 @@ capabilities change; `skillsense doctor` reports how stale the index is.
   `false`).
 - **Read-only scanning.** SkillSense never executes a discovered skill or script, and never
   parses `.env` files or other secret stores.
-- **Minimal hook output.** Injected context includes only a capability's name, type, source, a
-  short reason, and (optionally) its path — never full file contents. Set
-  `outputPathMode: hidden` to omit paths entirely, or `includeReasonsInOutput: false` /
-  `includePathsInOutput: false` to trim further.
+- **Minimal hook output, always.** Injected context is a single line — a capability's name and
+  (optionally) its path, nothing else — never full file contents, and never a type/source/reason
+  breakdown. Set `outputPathMode: hidden` or `includePathsInOutput: false` to drop the path too.
 - **Prompts aren't logged by default.** `logging.logPromptText: false` is the default; only a
   short hash of the prompt is recorded against `usage_events` for future analytics.
 - **Fail open, always.** Any internal error in a hook — bad input, missing index, a parser bug —

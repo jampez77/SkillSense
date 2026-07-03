@@ -69,7 +69,6 @@ export interface SkillSenseConfig {
   minScore: number;
   maxRecommendations: number;
   includePathsInOutput: boolean;
-  includeReasonsInOutput: boolean;
   outputPathMode: OutputPathMode;
   autoScan: {
     enabled: boolean;
