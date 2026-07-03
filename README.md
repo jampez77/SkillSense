@@ -66,7 +66,10 @@ Before your prompt reaches Claude Code or Codex, SkillSense:
 ## At a glance
 
 The injected nudge is deliberately a single line — just enough for the agent to act on, nothing
-more. When exactly one capability matches:
+more. It also skips the capability's name entirely when it's already obvious from the path (a
+`SKILL.md` whose parent directory *is* the name), and only spells it out when it isn't — e.g. an
+MCP server living in a shared `.mcp.json`, or a skill whose frontmatter name doesn't match its
+directory. When exactly one capability matches:
 
 ```text
 You ask:
@@ -74,17 +77,16 @@ You ask:
    failed, probably transient, refreshing the integration fixes it."
 
 SkillSense quietly adds:
-  SkillSense: relevant installed capability — home-assistant-integration-debugging
-  (~/.codex/skills/home-assistant-integration-debugging)
+  SkillSense: relevant installed capability — ~/.codex/skills/home-assistant-integration-debugging
 ```
 
 When more than one capability matches, SkillSense doesn't guess on your behalf — it hands the
-choice to you:
+choice to you (name shown only where the path alone wouldn't be enough):
 
 ```text
 SkillSense quietly adds:
   SkillSense: multiple relevant capabilities installed — ask the user which to use:
-  flutter-performance-review (~/.claude/skills/flutter-performance-review),
+  ~/.claude/skills/flutter-performance-review,
   android-profiler-checklist (~/Development/shared-skills/android-profiler)
 ```
 

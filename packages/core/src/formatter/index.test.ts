@@ -27,37 +27,63 @@ describe("formatRecommendationBody", () => {
     expect(formatRecommendationBody([], options)).toBe("");
   });
 
-  it("is a single compact line naming the capability and its path for one match", () => {
-    const body = formatRecommendationBody([makeMatch()], options);
-    expect(body.split("\n")).toHaveLength(1);
-    expect(body).toContain("flutter-performance-review");
-    expect(body).toContain("/Users/x/.claude/skills/flutter-performance-review/SKILL.md");
-  });
-
   it("never includes type, source, or reason text — the point is to be minimal", () => {
     const body = formatRecommendationBody([makeMatch()], options);
+    expect(body.split("\n")).toHaveLength(1);
     expect(body).not.toContain("Type:");
     expect(body).not.toContain("Source:");
     expect(body).not.toContain("Reason:");
   });
 
-  it("omits the path when outputPathMode is hidden", () => {
-    const body = formatRecommendationBody([makeMatch()], { ...options, outputPathMode: "hidden" });
-    expect(body).not.toContain(".claude/skills");
+  it("drops the name entirely when it's recoverable from the SKILL.md path (parent dir == name)", () => {
+    // path's parent dir *is* "flutter-performance-review" — showing the name too would be pure duplication
+    const body = formatRecommendationBody([makeMatch()], options);
+    expect(body).toBe("SkillSense: relevant installed capability — /Users/x/.claude/skills/flutter-performance-review/SKILL.md");
   });
 
-  it("omits the path when includePathsInOutput is false", () => {
+  it("drops the name when it's recoverable from a flat file's basename", () => {
+    const flat = makeMatch({ name: "do-thing", path: "/Users/x/.claude/commands/do-thing.md" });
+    const body = formatRecommendationBody([flat], options);
+    expect(body).toBe("SkillSense: relevant installed capability — /Users/x/.claude/commands/do-thing.md");
+  });
+
+  it("keeps the name when it genuinely differs from the path (e.g. an MCP server in a shared config file)", () => {
+    const mcp = makeMatch({ name: "github", type: "mcp_server", path: "/Users/x/project/.mcp.json" });
+    const body = formatRecommendationBody([mcp], options);
+    expect(body).toBe("SkillSense: relevant installed capability — github (/Users/x/project/.mcp.json)");
+  });
+
+  it("keeps the name when a skill's frontmatter name doesn't match its directory", () => {
+    // mirrors the real fixture: dir is home-assistant-debugging, frontmatter name differs
+    const skill = makeMatch({
+      name: "home-assistant-integration-debugging",
+      path: "/Users/x/.codex/skills/home-assistant-debugging/SKILL.md",
+    });
+    const body = formatRecommendationBody([skill], options);
+    expect(body).toBe(
+      "SkillSense: relevant installed capability — home-assistant-integration-debugging (/Users/x/.codex/skills/home-assistant-debugging/SKILL.md)",
+    );
+  });
+
+  it("falls back to name alone when the path is suppressed", () => {
+    const body = formatRecommendationBody([makeMatch()], { ...options, outputPathMode: "hidden" });
+    expect(body).toBe("SkillSense: relevant installed capability — flutter-performance-review");
+  });
+
+  it("falls back to name alone when includePathsInOutput is false", () => {
     const body = formatRecommendationBody([makeMatch()], { ...options, includePathsInOutput: false });
-    expect(body).not.toContain(".claude/skills");
+    expect(body).toBe("SkillSense: relevant installed capability — flutter-performance-review");
   });
 
   it("defers to the user instead of picking one when there is more than one match", () => {
     const other = makeMatch({ id: "cap-2", name: "android-profiler-checklist", path: "/Users/x/.claude/skills/android/SKILL.md" });
     const body = formatRecommendationBody([makeMatch(), other], options);
     expect(body.split("\n")).toHaveLength(1);
-    expect(body).toContain("ask the user which to use");
-    expect(body).toContain("flutter-performance-review");
-    expect(body).toContain("android-profiler-checklist");
+    expect(body).toBe(
+      "SkillSense: multiple relevant capabilities installed — ask the user which to use: " +
+        "/Users/x/.claude/skills/flutter-performance-review/SKILL.md, " +
+        "android-profiler-checklist (/Users/x/.claude/skills/android/SKILL.md)",
+    );
   });
 });
 

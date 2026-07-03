@@ -1,5 +1,6 @@
 import os from "node:os";
-import type { CapabilityMatch, OutputPathMode } from "../types.js";
+import nodePath from "node:path";
+import type { Capability, CapabilityMatch, OutputPathMode } from "../types.js";
 
 export interface FormatOptions {
   includePathsInOutput: boolean;
@@ -15,10 +16,25 @@ function displayPath(absPath: string, mode: OutputPathMode): string | undefined 
   return absPath;
 }
 
+/**
+ * True when a reader could recover the capability's name just by looking at its path (a SKILL.md
+ * whose parent directory is the name, or a flat file whose basename is the name) — in that case
+ * showing both is pure duplication. False for MCP servers/hooks, whose path points at a shared
+ * config file (.mcp.json, .codex/hooks.json) that says nothing about which entry it is, and for
+ * any capability whose frontmatter `name` was deliberately set to something other than its
+ * filename/directory.
+ */
+function isNameRedundantWithPath(cap: Capability): boolean {
+  const base = nodePath.basename(cap.path);
+  const stem = base.toLowerCase() === "skill.md" ? nodePath.basename(nodePath.dirname(cap.path)) : nodePath.basename(cap.path, nodePath.extname(cap.path));
+  return stem.toLowerCase() === cap.name.toLowerCase();
+}
+
 function describe(match: CapabilityMatch, options: FormatOptions): string {
   const cap = match.capability;
   const path = options.includePathsInOutput ? displayPath(cap.path, options.outputPathMode) : undefined;
-  return path ? `${cap.name} (${path})` : cap.name;
+  if (!path) return cap.name;
+  return isNameRedundantWithPath(cap) ? path : `${cap.name} (${path})`;
 }
 
 /**
