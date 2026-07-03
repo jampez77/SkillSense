@@ -5,6 +5,8 @@ tags:
   - flutter
   - performance
   - mobile
+metadata:
+  internal: true
 ---
 
 # Flutter Performance Review

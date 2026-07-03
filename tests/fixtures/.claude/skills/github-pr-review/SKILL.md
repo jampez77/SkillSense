@@ -5,6 +5,8 @@ tags:
   - github
   - pull-request
   - code-review
+metadata:
+  internal: true
 ---
 
 # GitHub PR Review

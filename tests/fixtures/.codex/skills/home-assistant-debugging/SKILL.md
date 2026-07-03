@@ -5,6 +5,8 @@ tags:
   - home-assistant
   - python
   - integration
+metadata:
+  internal: true
 ---
 
 # Home Assistant Integration Debugging
